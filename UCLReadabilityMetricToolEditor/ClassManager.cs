@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace UCLReadabilityMetricToolEditor
 {
@@ -18,15 +19,43 @@ namespace UCLReadabilityMetricToolEditor
 
         private String className = "";
         private IWpfTextView textView;
+        private DispatcherTimer timer;
+
+        /// Tracking objects
         private LineFrequency lineFrequency;
+        private MouseTracker mouseTracker;
+        private CaretTracker caretTracker;
+        private TimeTracker timeTracker;
+        private TextHighlightTracker textHighlightTracker;
 
         public ClassManager(String className, IWpfTextView textView)
         {
             this.className = className;
             this.textView = textView;
             DateTime dt = DateTime.Now;
+            configureTimer();
             lineFrequency = new LineFrequency(textView, dt);
+            mouseTracker = new MouseTracker(textView,dt);
+            caretTracker = new CaretTracker(textView, dt);
+            timeTracker = new TimeTracker(textView, dt);
+            textHighlightTracker = new TextHighlightTracker(textView, dt);
             SubscribeToListeners();
+        }
+
+        private void configureTimer()
+        {
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1.0);
+            timer.Tick += timer_Tick;
+        }
+
+        void timer_Tick(object sender, EventArgs e)
+        {
+            DateTime currentTime = DateTime.UtcNow;
+            lineFrequency.timer_Tick(sender, e);
+            mouseTracker.timer_Tick(currentTime);
+            caretTracker.timer_Tick(sender, e);
+            textHighlightTracker.timer_Tick(sender, e);
         }
 
         public IWpfTextView GetTextView()
@@ -53,36 +82,14 @@ namespace UCLReadabilityMetricToolEditor
         //NOTE, NEEDS REFACTORING AND EDITING.
         public void Close()
         {
-            lineFrequency.PauseTimer();
             DateTime now = DateTime.Now;
+            lineFrequency.PauseTimer(now);
+            mouseTracker.PauseTimer(now);
+            caretTracker.PauseTimer(now);
+          
             Debug.WriteLine("Dumping results into text file");
             //create directory to store results.
-            String dateTime = now.ToLongDateString() + "_" + now.ToLongTimeString();
-            className = className.Replace(":", "-");
-            className = className.Replace("/", "--");
-
-            dateTime = dateTime.Replace(":", "-");
-            dateTime = dateTime.Replace("/", "--");
-            Directory.CreateDirectory("/" + className);
-
-            String path = "/" + className + "/" + dateTime+".txt";
-
-            using(StreamWriter tw = new StreamWriter(path,true))
-            {
-                for (int i = 0; i < lineFrequency.getNumberOfSessions()-1; i++)
-                {
-                    tw.WriteLine("Start session:" + lineFrequency.getStartTimes()[i]);
-                    tw.WriteLine("-----");
-                    for (int j = 0; j < lineFrequency.getLineCounters()[i].Count(); j++)
-                    {
-                        tw.WriteLine(j + 1 + "," + lineFrequency.getLineCounters()[i][j]);
-                    }
-                    tw.WriteLine("-----");
-                    tw.WriteLine("End session:" + lineFrequency.getEndTimes()[i]);
-                    tw.WriteLine("----------");
-                }
-                tw.Close();
-            }
+            ExportData.export(className, now, lineFrequency, textHighlightTracker, caretTracker, mouseTracker, timeTracker);
 
                
         }
@@ -95,8 +102,14 @@ namespace UCLReadabilityMetricToolEditor
         void textView_LostAggregateFocus(object sender, EventArgs e)
         {
             //pause tracking.
+            DateTime now = DateTime.Now;
             Debug.WriteLine(className + " lost focus!");
-            lineFrequency.PauseTimer();
+            lineFrequency.PauseTimer(now);
+            mouseTracker.PauseTimer(now);
+            caretTracker.PauseTimer(now);
+            timeTracker.PauseTimer(now);
+            textHighlightTracker.PauseTimer(now);
+            timer.Stop();
         }
 
         /// <summary>
@@ -107,16 +120,15 @@ namespace UCLReadabilityMetricToolEditor
         void textView_GotAggregateFocus(object sender, EventArgs e)
         {
             //resume tracking.
+            DateTime now = DateTime.Now;
             Debug.WriteLine(className + " got focus!");
-            lineFrequency.ResumeTimer();
+            lineFrequency.ResumeTimer(now);
+            mouseTracker.ResumeTimer(now);
+            caretTracker.ResumeTimer(now);
+            timeTracker.ResumeTimer(now);
+            textHighlightTracker.ResumeTimer(now);
+            timer.Start();
         }
         
-        /// <summary>
-        /// When the document is closed, this event is triggered.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// 
-
     }
 }
