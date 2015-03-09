@@ -27,6 +27,7 @@ namespace UCLReadabilityMetricToolEditor
         private CaretTracker caretTracker;
         private TimeTracker timeTracker;
         private TextHighlightTracker textHighlightTracker;
+        private EyeTracker eyeTracker; 
 
         public ClassManager(String className, IWpfTextView textView)
         {
@@ -38,6 +39,7 @@ namespace UCLReadabilityMetricToolEditor
             mouseTracker = new MouseTracker(textView,dt);
             caretTracker = new CaretTracker(textView, dt);
             timeTracker = new TimeTracker(textView, dt);
+            eyeTracker = new EyeTracker(textView);
             textHighlightTracker = new TextHighlightTracker(textView, dt);
             SubscribeToListeners();
         }

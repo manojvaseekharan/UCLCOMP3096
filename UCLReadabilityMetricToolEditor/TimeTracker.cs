@@ -17,6 +17,8 @@ namespace UCLReadabilityMetricToolEditor
         private List<DateTime> endTimes;
 
 
+
+
         public TimeTracker(IWpfTextView view, DateTime dt)
         {
             this.view = view;

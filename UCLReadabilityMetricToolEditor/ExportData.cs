@@ -84,11 +84,9 @@ namespace UCLReadabilityMetricToolEditor
                 {
                     tw.WriteLine("Start session:" + mouse.getStartTimes()[i]);
                     tw.WriteLine("-----");
-                    tw.WriteLine("x,y,time,lineNo");
-                    for (int j = 0; j < mouse.getRecord()[i].Count(); j++)
+                    for (int j = 0; j < mouse.getLineCounters()[i].Count(); j++)
                     {
-                        MouseRecord current = mouse.getRecord()[i][j];
-                        tw.WriteLine(current.X + "," + current.Y + "," + current.Time.ToLongTimeString() + "," + current.LineNo);
+                        tw.WriteLine(j + 1 + "," + mouse.getLineCounters()[i][j]);
                     }
                     tw.WriteLine("-----");
                     tw.WriteLine("End session:" + mouse.getEndTimes()[i]);

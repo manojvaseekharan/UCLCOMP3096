@@ -36,12 +36,18 @@ namespace UCLReadabilityMetricToolEditor
 
             List<List<MouseRecord>> sessions = new List<List<MouseRecord>>();
 
+            private List<int[]> lineCounters;
+
+            private int[] currentLineCounter;
+
             public MouseTracker(IWpfTextView textView, DateTime start)
             {
                 this.textView = textView;
                 this.start = start;
                 startTimes = new List<DateTime>();
                 endTimes = new List<DateTime>();
+                lineCounters = new List<int[]>();
+                currentLineCounter = new int[textView.TextSnapshot.LineCount];
             }
 
             public void timer_Tick(DateTime dt)
@@ -50,6 +56,7 @@ namespace UCLReadabilityMetricToolEditor
                 r.X = mousePos.X;
                 r.Y = mousePos.Y;
                 r.LineNo = lineNumber;
+                currentLineCounter[(int)lineNumber]++;
                 r.Time = dt;
                 collectedPoints.Add(r);
                 Debug.WriteLine("MOUSE: x = " + r.X + " y = " + r.Y + " line no: " + r.LineNo);
@@ -64,11 +71,13 @@ namespace UCLReadabilityMetricToolEditor
                 endTimes.Add(end);
 
                 sessions.Add(collectedPoints);
+                lineCounters.Add(currentLineCounter);
 
                 start = new DateTime();
                 end = new DateTime();
 
                 collectedPoints = new List<MouseRecord>();
+                currentLineCounter = new int[textView.TextSnapshot.LineCount];
             }
 
             public void ResumeTimer(DateTime now)
@@ -89,6 +98,11 @@ namespace UCLReadabilityMetricToolEditor
             public List<DateTime> getEndTimes()
             {
                 return endTimes;
+            }
+
+            public List<int[]> getLineCounters()
+            {
+                return lineCounters;
             }
 
             public int getNumberOfSessions()
