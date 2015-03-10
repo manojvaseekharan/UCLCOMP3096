@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Collections;
 using System.ComponentModel.Composition;
 using System.Windows.Threading;
+using System.Windows.Interop;
 
 namespace UCLReadabilityMetricToolEditor
 {
@@ -25,6 +26,7 @@ namespace UCLReadabilityMetricToolEditor
             private static Point mousePos;
             private static double lineNumber;
 
+  
             //start/end time of each session
             private List<DateTime> startTimes;
             private List<DateTime> endTimes;
@@ -56,10 +58,17 @@ namespace UCLReadabilityMetricToolEditor
                 r.X = mousePos.X;
                 r.Y = mousePos.Y;
                 r.LineNo = lineNumber;
-                currentLineCounter[(int)lineNumber]++;
+                try
+                {
+                    currentLineCounter[(int)lineNumber - 1]++;
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    currentLineCounter[currentLineCounter.Length - 1]++;
+                }
+                
                 r.Time = dt;
                 collectedPoints.Add(r);
-                Debug.WriteLine("MOUSE: x = " + r.X + " y = " + r.Y + " line no: " + r.LineNo);
             }
 
             //pause timer

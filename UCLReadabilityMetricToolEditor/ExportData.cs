@@ -32,6 +32,27 @@ namespace UCLReadabilityMetricToolEditor
             }
         }
 
+        private static void exportEye(String path, EyeTracker eye)
+        {
+            String fileName = path + "/" + "eye_tracker.txt";
+            using (StreamWriter tw = new StreamWriter(fileName, true))
+            {
+                for (int i = 0; i < eye.getNumberOfSessions() - 1; i++)
+                {
+                    tw.WriteLine("Start session:" + eye.getStartTimes()[i]);
+                    tw.WriteLine("-----");
+                    for (int j = 0; j < eye.getLineCounters()[i].Count(); j++)
+                    {
+                        tw.WriteLine(j + 1 + "," + eye.getLineCounters()[i][j]);
+                    }
+                    tw.WriteLine("-----");
+                    tw.WriteLine("End session:" + eye.getEndTimes()[i]);
+                    tw.WriteLine("----------");
+                }
+                tw.Close();
+            }
+        }
+
         private static void exportTextHighlight(String path, TextHighlightTracker textHighlight)
         {
             String fileName = path + "/" + "text_highlight.txt";
@@ -110,7 +131,7 @@ namespace UCLReadabilityMetricToolEditor
             }
         }
 
-        public static void export(String className, DateTime now, LineFrequency lineFrequency, TextHighlightTracker textHighlight, CaretTracker caret, MouseTracker mouse, TimeTracker time)
+        public static void export(String className, DateTime now, LineFrequency lineFrequency, TextHighlightTracker textHighlight, CaretTracker caret, MouseTracker mouse, TimeTracker time, EyeTracker eye)
         {
             Debug.WriteLine("Dumping results into text file");
             //Create dateTime string to name our directory.
@@ -132,6 +153,7 @@ namespace UCLReadabilityMetricToolEditor
             exportCaret(path, caret);
             exportMouse(path, mouse);
             exportTime(path, time);
+            exportEye(path, eye);
         }
     }
 }

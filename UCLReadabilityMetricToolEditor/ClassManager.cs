@@ -31,7 +31,9 @@ namespace UCLReadabilityMetricToolEditor
 
         public ClassManager(String className, IWpfTextView textView)
         {
+            //get coordinate of corners of editor.
             this.className = className;
+            
             this.textView = textView;
             DateTime dt = DateTime.Now;
             configureTimer();
@@ -39,13 +41,14 @@ namespace UCLReadabilityMetricToolEditor
             mouseTracker = new MouseTracker(textView,dt);
             caretTracker = new CaretTracker(textView, dt);
             timeTracker = new TimeTracker(textView, dt);
-            eyeTracker = new EyeTracker(textView);
+            eyeTracker = new EyeTracker(textView, dt);
             textHighlightTracker = new TextHighlightTracker(textView, dt);
             SubscribeToListeners();
         }
 
         private void configureTimer()
         {
+            
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1.0);
             timer.Tick += timer_Tick;
@@ -58,6 +61,8 @@ namespace UCLReadabilityMetricToolEditor
             mouseTracker.timer_Tick(currentTime);
             caretTracker.timer_Tick(sender, e);
             textHighlightTracker.timer_Tick(sender, e);
+            eyeTracker.timer_Tick(sender, e);
+            
         }
 
         public IWpfTextView GetTextView()
@@ -81,17 +86,19 @@ namespace UCLReadabilityMetricToolEditor
         /// </summary>
         /// 
 
-        //NOTE, NEEDS REFACTORING AND EDITING.
         public void Close()
         {
             DateTime now = DateTime.Now;
             lineFrequency.PauseTimer(now);
             mouseTracker.PauseTimer(now);
             caretTracker.PauseTimer(now);
+            eyeTracker.PauseTimer(now);
+            timeTracker.PauseTimer(now);
+            textHighlightTracker.PauseTimer(now);
           
             Debug.WriteLine("Dumping results into text file");
             //create directory to store results.
-            ExportData.export(className, now, lineFrequency, textHighlightTracker, caretTracker, mouseTracker, timeTracker);
+            ExportData.export(className, now, lineFrequency, textHighlightTracker, caretTracker, mouseTracker, timeTracker, eyeTracker);
 
                
         }
@@ -111,6 +118,7 @@ namespace UCLReadabilityMetricToolEditor
             caretTracker.PauseTimer(now);
             timeTracker.PauseTimer(now);
             textHighlightTracker.PauseTimer(now);
+            eyeTracker.PauseTimer(now);
             timer.Stop();
         }
 
@@ -129,6 +137,7 @@ namespace UCLReadabilityMetricToolEditor
             caretTracker.ResumeTimer(now);
             timeTracker.ResumeTimer(now);
             textHighlightTracker.ResumeTimer(now);
+            eyeTracker.ResumeTimer(now);
             timer.Start();
         }
         
