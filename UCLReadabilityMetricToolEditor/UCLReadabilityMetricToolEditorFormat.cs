@@ -23,8 +23,8 @@ namespace UCLReadabilityMetricToolEditor
         public UCLReadabilityMetricToolEditorFormat()
         {
             this.DisplayName = "UCLReadabilityMetricToolEditor"; //human readable version of the name
-            this.BackgroundColor = Colors.BlueViolet;
-            this.TextDecorations = System.Windows.TextDecorations.Underline;
+            this.BackgroundColor = Colors.Transparent;
+            this.TextDecorations = null;
         }
     }
     #endregion //Format definition
