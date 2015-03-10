@@ -50,7 +50,7 @@ namespace UCLReadabilityMetricToolEditor
         {
             
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1.0);
+            timer.Interval = TimeSpan.FromMilliseconds(250);
             timer.Tick += timer_Tick;
         }
 

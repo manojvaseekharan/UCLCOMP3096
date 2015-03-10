@@ -112,12 +112,21 @@ namespace UCLReadabilityMetricToolEditor
 
                 int noOfLines = endPosition - startPosition;
                 double noOfPixels = noOfLines * textView.LineHeight;
-                double lineNumberRelativeToView = (eyePoint.Y-wr.Top) / textView.LineHeight;
+                double lineNumberRelativeToView = (eyePoint.Y-wr.Top) / (textView.LineHeight*(textView.ZoomLevel/100));
                 double lineNumberAbsoluteToView = lineNumberRelativeToView + (startPosition);
 
                 lineNumber = Math.Ceiling(lineNumberAbsoluteToView);
 
-                currentLineCounter[(int)lineNumber - 1]++;
+                try
+                {
+                    currentLineCounter[(int)lineNumber - 1]++;
+                }
+                catch(IndexOutOfRangeException)
+                {
+                    currentLineCounter[currentLineCounter.Length - 1]++;
+                }
+                
+                Debug.WriteLine("Gazing at line: " + lineNumber);
             }
         }
 

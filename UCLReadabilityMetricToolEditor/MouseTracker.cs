@@ -152,8 +152,8 @@ namespace UCLReadabilityMetricToolEditor
                     int endPosition = textView.TextSnapshot.GetLineNumberFromPosition(textView.TextViewLines.LastVisibleLine.Start);
 
                     int noOfLines = endPosition - startPosition;
-                    double noOfPixels = noOfLines * textView.LineHeight;
-                    double lineNumberRelativeToView = mousePos.Y / textView.LineHeight;
+                    double noOfPixels = noOfLines * (textView.LineHeight * textView.ZoomLevel/100);
+                    double lineNumberRelativeToView = mousePos.Y / (textView.LineHeight * textView.ZoomLevel/100);
                     double lineNumberAbsoluteToView = lineNumberRelativeToView + (startPosition);
 
                     lineNumber = Math.Ceiling(lineNumberAbsoluteToView);
